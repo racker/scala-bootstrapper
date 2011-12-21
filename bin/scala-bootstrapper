@@ -92,15 +92,20 @@ Dir["#{root}/**/*"].select{|path| File.file?(path)}.each do |path|
   template = ERB.new(content, nil, nil, "@output")
   target_path = gsub_birds(relative, project_name, namespace).sub(/\.erb$/, '')
   if File.exists?(target_path) && !$overwrite_all
-    print "File exists `#{relative}`, replace? ([Y]es, [N]o, [A]ll, [Q]uit)"
-    $stdout.flush
-    case STDIN.gets
-    when /^y/i: # continue
-    when /^n/i: next
-    when /^a/i: $overwrite_all = true
-    when /^q/i: exit(2)
-    else
-      retry
+    acceptable_answer = false
+    while !acceptable_answer
+        print "File exists `#{relative}`, replace? ([Y]es, [N]o, [A]ll, [Q]uit)"
+        $stdout.flush
+        case STDIN.gets
+            when /^y/i
+                acceptable_answer = true
+            when /^n/i 
+                next
+            when /^a/i 
+                $overwrite_all = true
+            when /^q/i 
+                exit(2)
+        end
     end
   end
   puts "writing #{target_path}"
